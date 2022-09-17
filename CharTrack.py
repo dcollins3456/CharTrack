@@ -73,75 +73,8 @@ def openchar(character:str):
         print (f"OPENCHAR: {thischar.charname} loaded from {charfile}.")
     return thischar
 
-@client.slash_command(name="new", description="Make a new Player Character, linked to you")
-async def newchar(interaction: Interaction, name:str, playbook:str):
-    thischar = pchar(name, playbook)
-    characterlist = opencharlist()
-    #nickname = scrub(name).lower()
-    nickname = thischar.safename
-    charfile = nickname+".pkl"
-    print(f"\n- - - - - - -\nNew character created: {name}\nby {interaction.user.name}\n- - - - - - -\n")
-    characterlist.append(charfile)
-    savechar(charfile, thischar)
-    savecharlist(characterlist, 'characterlist.pkl')
-    await interaction.response.send_message(f'Character Created:\n\"{thischar.safename}\"\nstress: {thischar.stress}')
-    
-@client.slash_command(name="listall", description="Displays a list of all registered Player Characters and nicknames.")
-async def listall(interaction: Interaction):
-    embed=discord.Embed(title="PLAYER CHARACTERS | Nicknames", color=0x720e4d)
-    characterlist = opencharlist()
-    i=0
-    length = len(characterlist)
-    print(f"LISTALL: loaded characterlist length: {length}")
-    print(characterlist)
-    while i < length:
-        filename = characterlist[i]
-        thischar = openchar(filename)
-        print(f"added filename: {filename}")
-        embed.add_field(name=thischar.charname, value=thischar.safename, inline=False)
-        i=i+1
-    await interaction.response.send_message(embed=embed)
-
-@client.slash_command(name="addharm", description="Add harm to a Player Character")
-async def addharm(interaction: Interaction, nickname:str, level:int, description:str):    #open file
-    filename = nickname+"pkl"
-    thischar = openchar(filename)
-
-    def addharm1(description):
-        thischar.harm1.insert(0, description)        
-        if len(thischar.harm1) > 2:
-            addharm2(thischar.harm1.pop())
-
-    def addharm2(description):
-        thischar.harm2.insert(0, description)        
-        if len(thischar.harm2) > 2:
-            addharm3(thischar.harm2.pop)
-
-    def addharm3(description):
-        thischar.harm3.insert(0, description)        
-        if len(thischar.harm1) > 1:
-            interaction.channel.send("LEVEL 4 HARM! Incur permanent, catastrophic, or fatal harm")
-        
-    if level == 1:
-        addharm1(description)
-    elif level == 2:
-        addharm2(description)
-    elif level == 3:
-        addharm3(description)
-    else:
-        interaction.channel.send("INVALID HARM LEVEL, please use 1, 2, or 3.")
-        
-    #dump file
-    charfile = nickname+".pkl"
-    savechar(charfile, thischar)
-    await interaction.response.send_message(f"Level {level} harm: {description} added to {thischar.charname}")
- 
-@client.slash_command(name="status", description="Presents a PC's status")
-async def displaystatus(interaction: Interaction, nickname:str):
-    filename = nickname+".pkl"
-    thischar = openchar(filename)
-    embed=discord.Embed(title="CHARACTER NAME (nickname)", color=0x720e4d)
-    embed.add_field(name="Stress: 8", value=thischar.stress, inline=False)
+def buildstatusembed(thischar):
+    embed=discord.Embed(title=(f"**{thischar.charname}** ( '{thischar.safename}' ) : {thischar.playbook}"), description=(f"Stress: {thischar.stress}"), color=0x720e4d)
     if len(thischar.harm1) >= 1:
         embed.add_field(name="Harm Lvl.1: [Less Effect]", value=thischar.harm1[0], inline=False)
     if len(thischar.harm1) > 1:
@@ -152,19 +85,109 @@ async def displaystatus(interaction: Interaction, nickname:str):
         embed.add_field(name="Harm Lvl.2: [ -1d ]", value=thischar.harm2[1], inline=True)
     if len(thischar.harm3) >= 1:
         embed.add_field(name="Harm Lvl.3: [ Requires Help ]", value=thischar.harm3[0], inline=False)
+    return embed
+
+@client.slash_command(name="new", description="Make a new Player Character, linked to you")
+async def newchar(interaction: Interaction, name:str, playbook:str):
+    name = name.title()
+    playbook = playbook.title()
+    thischar = pchar(name, playbook)
+    characterlist = opencharlist()
+    nickname = thischar.safename
+    charfile = nickname+".pkl"
+    print(f"\n- - - - - - -\nNew character created: {name} ( '{thischar.safename}' ), the {playbook}\nby {interaction.user.name}\n- - - - - - -\n")
+    characterlist.append(charfile)
+    savechar(charfile, thischar)
+    savecharlist(characterlist, 'characterlist.pkl')
+    await interaction.response.send_message((f"Character Created: **{thischar.charname}** ( '{thischar.safename}' ), the {playbook}"))
+    
+@client.slash_command(name="listall", description="Displays a list of all registered Player Characters and nicknames.")
+async def listall(interaction: Interaction):
+    embed=discord.Embed(title="PLAYER CHARACTERS | Nicknames", color=0x720e4d)
+    characterlist = opencharlist()
+    i=0
+    length = len(characterlist)
+    print(f"LISTALL: loaded characterlist length: {length}")
+
+    if length == 0:
+        embed.add_field(name="ERROR: no Player Characters were found", value=None, inline=False)
+    else:
+        while i < length:
+            filename = characterlist[i]
+            thischar = openchar(filename)
+            print(f"added filename: {filename}")
+            embed.add_field(name=thischar.charname, value=thischar.safename, inline=False)
+            i=i+1
     await interaction.response.send_message(embed=embed)
+
+@client.slash_command(name="addharm", description="Add harm to a Player Character")
+async def addharm(interaction: Interaction, nickname:str, level:int, description:str):    #open file
+    filename = nickname+".pkl"
+    thischar = openchar(filename)
+    message = "Harm processed"
+    embed=discord.Embed(title=message, color=0xAA2255)
+    invalid = False
+    
+    def addharm1(description):
+        thischar.harm1.insert(0, description)        
+        if len(thischar.harm1) > 2:
+            addharm2(thischar.harm1.pop())
+
+    def addharm2(description):
+        thischar.harm2.insert(0, description)        
+        if len(thischar.harm2) > 2:
+            addharm3(thischar.harm2.pop())
+
+    def addharm3(description):
+        thischar.harm3.insert(0, description)        
+            
+    if level == 1:
+        addharm1(description)
+    elif level == 2:
+        addharm2(description)
+    elif level == 3:
+        addharm3(description)
+    else:
+        message = "**INVALID HARM LEVEL**, please use 1, 2, or 3."
+        invalid = True
+        embed=discord.Embed(title=message, color=0xDD0000)
+        
+    #dump file
+    charfile = nickname+".pkl"
+    savechar(charfile, thischar)
+    statusembed = buildstatusembed(thischar)
+    await interaction.response.send_message(embed=statusembed)
+    if len(thischar.harm3) > 1:
+        grab = thischar.harm3[0]
+        thischar.harm3.clear()
+        thischar.harm3.append(grab)
+        print(f"ADDHARM3: shortened thischar.harm3 to: {thischar.harm3}")
+        message = "**LEVEL 4 HARM!!**"
+        desc = "Incur permanent, catastrophic, or fatal harm"
+        embed=discord.Embed(title=message, description=desc, color=0xAA2255)
+        await interaction.followup.send(embed=embed)
+    if invalid == True:
+        await interaction.followup.send(embed=embed)
+    
+
+@client.slash_command(name="status", description="Presents a PC's status")
+async def displaystatus(interaction: Interaction, nickname:str):
+    filename = nickname+".pkl"
+    thischar = openchar(filename)
+    statusembed = buildstatusembed(thischar)
+    await interaction.response.send_message(embed=statusembed)
     
 @client.slash_command(name="nickname", description="Allows renaming of a Character's input name")
-async def nickthename(interaction: Interaction, nickname:str, newnick:str):
+async def nickname(interaction: Interaction, nickname:str, newnick:str):
     #open file
     filename = nickname+".pkl"
     thischar = openchar(filename)
     #change nickname
-    thischar.nickname = newnick
+    thischar.nickname = newnick.lower()
     #dump file
-    charfile = nickname+".pkl"
+    charfile = newnick+".pkl"
     savechar(charfile, thischar)
-    await interaction.response.send_message(f"{thischar.charname} nickname updated to {nickname}")
+    await interaction.response.send_message(f"{thischar.charname} nickname updated to {newnick}")
 
 @client.event
 async def on_ready():
