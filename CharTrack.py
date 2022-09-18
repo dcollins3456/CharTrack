@@ -4,6 +4,7 @@ import pickle
 from nextcord import Interaction
 from nextcord.ext import commands
 import discord
+import imgkit
 import os
 from os import path
 from dotenv import load_dotenv
@@ -16,6 +17,9 @@ testServerID:int = 1019312655384727657
 client = commands.Bot(command_prefix = "!", intents=intents)
 
 characterlist = list()
+
+
+
 
 class pchar:
     def __init__(self, charname, playbook):
