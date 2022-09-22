@@ -1,0 +1,203 @@
+
+@font-face {
+    font-family: Comicoro;
+    src: url("Comicoro.ttf");
+    font-style: normal;
+    
+}
+@font-face {
+    font-family: Kirsty;
+    src: url("Kirsty.ttf");
+    font-style:normal;
+    
+}
+body{
+    margin: 0px;
+    max-width: 800px;
+    max-height: 350px;
+    background-color: #b12222;
+}
+.maindiv {
+    margin: 0px;
+    background-image: url("trackbg03.png");
+    background-color: #000000;
+    background-size: 800px 350px;
+    width: 800px;
+    height: 350px;
+    position: absolute;
+    
+}
+.sub{
+    position: absolute;
+    width: 165px;
+    height: 300px;
+    left:1px;
+    top: 35px;
+    text-align: center;
+}
+
+.playbookbig{
+    font-family: Kirsty;
+    font-size: 24pt;
+    position: absolute;
+    top: 22px;
+    left: 35px;
+    padding-left: 10px;
+    color: #eeeeee;
+}
+.playbookbig .the{
+    font-family: Kirsty;
+    font-size: 16pt; 
+    color: #666666;
+    position: absolute;
+    left: -22px;
+}
+
+.title{
+    font-family: Kirsty;
+    font-size: 48px;
+    color: #eeeeee;
+    position: absolute; 
+                
+    top: 13px;
+    left: 9px;
+}
+
+.portraitbg{
+    position: relative;
+    width: 165px;
+    height: 350px;
+    left: 11px;
+}
+.footer{
+    font-family: Comicoro;
+    font-size: 16px;
+    position: relative;
+    top: 324px;
+    left: 1px;
+    text-align: center;
+    color: #eeeeee;
+}
+.attribs{
+    font-family: Comicoro;
+    font-size: 22pt;
+    position: relative;
+    text-align: left;
+    color: #eeeeee;
+    line-height: 21px;
+}
+.attribs img {
+    padding: 2.5px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+.attributes{
+    position: absolute;
+    left: 206px;
+    top: 248px;
+}
+.attribs.row{
+    color: #5555FF;
+}
+.attribs.one{
+    left:0px;
+    position: relative;
+    top:0px;
+    
+}
+.attribs.two{
+    left:199px;
+    position: relative;
+    top:-84px;
+}
+.attribs.three{
+    left:400px;
+    position: relative;
+    top:-168px;
+}
+.crimson{
+    color:#d40055;
+}
+.tracker{
+    font-family: Comicoro;
+    line-height: 18.5px;
+    font-size: 16px;
+    color: #cccccc;
+    position: absolute;
+    left: 353px;
+    top: 103px;
+    width: 200px;
+}
+.harm3_1{
+    position:absolute;
+}
+.harm2_2{
+    position:absolute;
+    top: 19px;
+}
+.harm2_1{
+    position:absolute;
+    top: 37px;
+}
+.harm1_2{
+    position:absolute;
+    top: 56px;
+}
+.harm1_1{
+    position:absolute;
+    top: 74px;
+}
+
+.tracker.item{
+    left: 565px;
+}
+.stress{
+    width:120px;
+    height:125px;
+    position:absolute;
+    left: 190px;
+    top: 86px;
+}
+.portrait{
+    border-top: 1px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #eeeeee;
+    width: 141px;
+    height: 225px;
+    position: absolute;
+    left: 24px;
+    top: 95px;
+    
+}
+.playbook{
+    width:118px;
+    height:40px;
+    position:absolute;
+    left: 658px;
+    top: 26px;
+}
+.pbtitle{
+    font-family: Kirsty;
+    font-size: 14pt;
+    color: #eeeeee;
+    position: absolute;     
+    text-align: right;           
+    top: 28px;
+    right: 152px;
+}
+.xp{
+    width:101px;
+    height:40px;
+    position:absolute;
+    top: 206px;
+}
+.xp.xp1{
+    left: 272px;
+}
+.xp.xp2{
+    left: 477px;
+}
+.xp.xp3{
+    left: 682px;
+}
