@@ -1,15 +1,14 @@
-from contextlib import nullcontext
+#from contextlib import nullcontext
 import nextcord
 import pickle
 from nextcord import Interaction
 from nextcord.ext import commands
 import discord
 import imgkit
-from html2image import Html2Image
-hti = Html2Image()
+#from html2image import Html2Image
+#hti = Html2Image()
 import dotenv
-#from easy_pil import Editor, load_image_async, Font
-from discord import File
+#from discord import File
 import os
 from os import path
 from dotenv import load_dotenv
@@ -24,9 +23,6 @@ client = commands.Bot(command_prefix = "!", intents=intents)
 
 characterlist = list()
 
-
-
-
 class pchar:
     def __init__(self, charname, playbook):
         self.charname = charname
@@ -40,7 +36,7 @@ class pchar:
         self.xp1 = 0
         self.xp2 = 0
         self.xp3 = 0
-        self.items = list()
+        self.items = ["", "", "", "", ""]
         self.hunt = 0
         self.study = 0
         self.survey = 0
@@ -75,6 +71,17 @@ def scrub(namepass:str):
     print(f"SCRUB: cleanname = '{cleanname}'")
     return cleanname
 
+def checkcharlist():
+    if path.exists('characterlist.pkl') == True:
+        print("\nfound characterlist.pkl...")
+    
+    else: 
+        characterlist = list()
+        with open ('characterlist.pkl', 'wb') as file:
+            characterlist = list()
+            print ("dumping characterlist object to file...")
+            pickle.dump(characterlist, file)
+
 def opencharlist():
     with open ('characterlist.pkl', 'rb') as file:
         characterlist = pickle.load(file)
@@ -83,11 +90,10 @@ def opencharlist():
     return characterlist
 
 def savecharlist(characterlist, filename):
-
     with open(filename, "wb") as file:
         pickle.dump(characterlist, file)
         listlen = len(characterlist)
-        print(f"SAVECHARLIST: characterlist updated. Total characters in list = {listlen}")
+        print(f"SAVECHARLIST: characterlist updated. characterlist = {characterlist}")
 
 def savechar(charfile, thischar):
     with open(charfile, 'wb') as file:
@@ -101,30 +107,15 @@ def openchar(character:str):
         print (f"OPENCHAR: {thischar.charname} loaded from {charfile}.")
     return thischar
 
-#def buildstatusembed(thischar):
-    embed=discord.Embed(title=(f"**{thischar.charname}** ( '{thischar.safename}' ) : {thischar.playbook}"), description=(f"Stress: {thischar.stress}"), color=0x720e4d)
-    if len(thischar.harm1) >= 1:
-        embed.add_field(name="Harm Lvl.1: [Less Effect]", value=thischar.harm1[0], inline=False)
-    if len(thischar.harm1) > 1:
-        embed.add_field(name="Harm Lvl.1: [Less Effect] ", value=thischar.harm1[1], inline=True)
-    if len(thischar.harm2) >= 1:
-        embed.add_field(name="Harm Lvl.2: [ -1d ]", value=thischar.harm2[0], inline=False)
-    if len(thischar.harm2) > 1:
-        embed.add_field(name="Harm Lvl.2: [ -1d ]", value=thischar.harm2[1], inline=True)
-    if len(thischar.harm3) >= 1:
-        embed.add_field(name="Harm Lvl.3: [ Requires Help ]", value=thischar.harm3[0], inline=False)
-    return embed
-
-
 def displaystatus(nickname:str):
     filename = nickname+".pkl"
     thischar = openchar(filename)
-  
-    itemline1 = ""
-    itemline2 = ""
-    itemline3 = ""
-    itemline4 = ""
-    itemline5 = ""
+        
+    itemline1 = thischar.items[0]
+    itemline2 = thischar.items[1]
+    itemline3 = thischar.items[2]
+    itemline4 = thischar.items[3]
+    itemline5 = thischar.items[4]
 
     atribs = [
     "<img src=\"a0.png\" /> <img src=\"a0.png\" /><img src=\"a0.png\" /><img src=\"a0.png\" />", 
@@ -142,7 +133,7 @@ def displaystatus(nickname:str):
     skirmish_atrib = atribs[thischar.skirmish]
     wreck_atrib = atribs[thischar.wreck]
     attune_atrib = atribs[thischar.attune]
-    command_atrib = atribs[thischar.consort]
+    command_atrib = atribs[thischar.command]
     consort_atrib = atribs[thischar.consort]
     sway_atrib = atribs[thischar.sway]
     
@@ -151,7 +142,6 @@ def displaystatus(nickname:str):
     harm2_1=""
     harm1_2=""
     harm1_1=""
-
 
     if len(thischar.harm1) > 0:
         harm1_1 = thischar.harm1[0]
@@ -164,6 +154,13 @@ def displaystatus(nickname:str):
     if len(thischar.harm3) > 0:
         harm3_1=thischar.harm3[0]
         
+    if thischar.stress > 5:
+        stresscracks = 1;
+        if thischar.stress > 7:
+            stresscracks = 2;
+    else:
+        stresscracks = 0;
+
     htmlbody=f"""
         <!DOCTYPE html>
             <html>
@@ -173,7 +170,6 @@ def displaystatus(nickname:str):
             <body>
                 <div class="maindiv">
                     <div class="title">{thischar.charname}</div>\n
-                    
                     <div class="portraitbg">\n
                         <div class="footer">Use <span class="crimson">'{thischar.safename}'</span> to interact</div>\n
                         <div class="sub">\n
@@ -200,12 +196,10 @@ def displaystatus(nickname:str):
                         <div class="attribs one">{study_atrib}</div>\n
                         <div class="attribs one">{survey_atrib}</div>\n
                         <div class="attribs one">{tinker_atrib}</div>\n
-
                         <div class="attribs two">{finesse_atrib}</div>\n
                         <div class="attribs two">{prowl_atrib}</div>\n
                         <div class="attribs two">{skirmish_atrib}</div>\n
                         <div class="attribs two">{wreck_atrib}</div>\n
-
                         <div class="attribs three">{attune_atrib}</div>\n
                         <div class="attribs three">{command_atrib}</div>\n
                         <div class="attribs three">{consort_atrib}</div>\n
@@ -213,6 +207,7 @@ def displaystatus(nickname:str):
                     </div>
                     <div class="portrait">\n
                         <img src="{thischar.profilepic}" />\n
+                        <img class="stresscracks" src="cracks{stresscracks}.png" />\n
                     </div>\n
                     <div class="playbook"><img src="pb{thischar.playbookxp}.png" /></div>\n
                     <div class="pbtitle">playbook</div>\n
@@ -241,13 +236,53 @@ async def newchar(interaction: Interaction, name:str, playbook:str):
     thischar = pchar(name, playbook)
     characterlist = opencharlist()
     nickname = thischar.safename
+    
+    if path.exists(f"GRAPHICS/{thischar.safename}.png"):
+        thischar.profilepic = f"{thischar.safename}.png"
+    elif path.exists(f"GRAPHICS/{thischar.safename}.jpg"):
+        thischar.profilepic = f"{thischar.safename}.jpg"
+    else:
+        #profile pic not found, assigning default
+        thischar.profilepic = "testport01.png"
+
     charfile = nickname+".pkl"
     print(f"\n- - - - - - -\nNew character created: {name} ( '{thischar.safename}' ), the {playbook}\nby {interaction.user.name}\n- - - - - - -\n")
     characterlist.append(charfile)
     savechar(charfile, thischar)
     savecharlist(characterlist, 'characterlist.pkl')
     await interaction.response.send_message((f"Character Created: **{thischar.charname}** ( '{thischar.safename}' ), the {playbook}"))
-    
+
+
+@client.slash_command(name="setnick", description="Allows renaming of a Character's input name")
+async def setnick(interaction: Interaction, nickname:str, newnick:str):
+    characterlist = opencharlist()
+    print(f"SETNICK: characterlist at beginning of op: {characterlist}")
+    filename = nickname+".pkl"
+    thischar = openchar(filename)
+    thischar.safename = newnick.lower()
+    if path.exists(f"GRAPHICS/{thischar.safename}.png"):
+        thischar.profilepic = f"{thischar.safename}.png"
+        print(f"NICKNAME: profile pic exists as PNG")
+    elif path.exists(f"GRAPHICS/{thischar.safename}.jpg"):
+        thischar.profilepic = f"{thischar.safename}.jpg"
+        print(f"NICKNAME: profile pic exists as JPG")
+    else:
+        #profile pic not found, assigning default
+        thischar.profilepic = "testport01.png"
+        print(f"NICKNAME: No Portrait file, \"{thischar.safename}\", detected, using default")
+    #dump file
+    charfile = newnick+".pkl"
+    oldfile = nickname+".pkl"
+    os.remove(oldfile)
+    savechar(charfile, thischar)
+    print(f"SETNICK: characterlist before append = {characterlist}")
+    characterlist.append(charfile)
+    characterlist.remove(oldfile)
+    print(f"SETNICK: characterlist after append/delete = {characterlist}")
+    await interaction.response.send_message(f"{thischar.charname} nickname updated to {newnick}")
+
+
+
 @client.slash_command(name="listall", description="Displays a list of all registered Player Characters and nicknames.")
 async def listall(interaction: Interaction):
     embed=discord.Embed(title="PLAYER CHARACTERS | Nicknames", color=0x720e4d)
@@ -269,8 +304,8 @@ async def listall(interaction: Interaction):
 
 @client.slash_command(name="addharm", description="Add harm to a Player Character")
 async def addharm(interaction: Interaction, nickname:str, level:int, description:str):    #open file
-    filename = nickname+".pkl"
-    thischar = openchar(filename)
+    charfile = nickname+".pkl"
+    thischar = openchar(charfile)
     message = "Harm processed"
     embed=discord.Embed(title=message, color=0xAA2255)
     invalid = False
@@ -302,7 +337,7 @@ async def addharm(interaction: Interaction, nickname:str, level:int, description
     else:
         message = "**INVALID HARM LEVEL**, please use 1, 2, or 3."
         invalid = True
-    charfile = nickname+".pkl"
+    
     savechar(charfile, thischar)    
     imgfile = displaystatus(nickname)
     await interaction.response.send_message(file=imgfile)
@@ -336,6 +371,29 @@ async def setxp(interaction: Interaction, nickname:str, track:str, value:int):
         thischar.playbookxp = value
     else:
         message = "**INVALID ENTRY | NO CHANGES MADE**, please use \"Insight\", \"Prowess\", \"Resolve\", or \"Playbook\", and an appropriate number value."
+        invalid = True
+
+    #dump file
+    charfile = nickname+".pkl"
+    savechar(charfile, thischar)
+    imgfile = displaystatus(nickname)
+    await interaction.response.send_message(file=imgfile)
+    if invalid == True:
+        await interaction.followup.send(message)
+
+@client.slash_command(name="setload", description="Edit individual line items in Load Tracker (\"na\" or \"none\" for blank line")
+async def setload(interaction: Interaction, nickname:str, line:int, desc:str):
+    filename = nickname+".pkl"
+    thischar = openchar(filename)
+    invalid = False
+
+    if (1 <= line <= 5) and len(desc) <= 40:
+        num = line - 1
+        thischar.items[num] = desc
+        if desc.lower() == "na" or desc == "none":
+            thischar.items[num] = ""
+    else:
+        message = "**INVALID ENTRY | NO CHANGES MADE**, please use line_number 1-5, and keep entries under 40 characters per line."
         invalid = True
 
     #dump file
@@ -393,23 +451,31 @@ async def setaction(interaction: Interaction, nickname:str, action:str, value:in
     if invalid == True:
         await interaction.followup.send(message)
 
+@client.slash_command(name="setstress", description="Define stress level for Player Character")
+async def setstress(interaction: Interaction, nickname:str, stress:int):
+    filename = nickname+".pkl"
+    thischar = openchar(filename)
+    invalid = False
+    if 0 <= stress <= 8:
+        thischar.stress = stress
+    else: 
+        message = "**INVALID ENTRY | NO CHANGES MADE**, please enter stress value 0-8."
+        invalid = True
+
+    #dump file
+    charfile = nickname+".pkl"
+    savechar(charfile, thischar)
+    imgfile = displaystatus(nickname)
+    await interaction.response.send_message(file=imgfile)
+    if invalid == True:
+        await interaction.followup.send(message)
+
 @client.slash_command(name="status", description="Presents a PC's status")
 async def getstatus(interaction: Interaction, nickname:str):
     
     imgfile = displaystatus(nickname)
     await interaction.response.send_message(file=imgfile)
 
-@client.slash_command(name="nickname", description="Allows renaming of a Character's input name")
-async def nickname(interaction: Interaction, nickname:str, newnick:str):
-    #open file
-    filename = nickname+".pkl"
-    thischar = openchar(filename)
-    #change nickname
-    thischar.nickname = newnick.lower()
-    #dump file
-    charfile = newnick+".pkl"
-    savechar(charfile, thischar)
-    await interaction.response.send_message(f"{thischar.charname} nickname updated to {newnick}")
 
 @client.event
 async def on_ready():
@@ -420,15 +486,7 @@ async def on_ready():
 
 # Creates 'characterlist.pkl' file if it does not exist, or loads it, if it does exist.   
 
-def checkcharlist():
-    if path.exists('characterlist.pkl') == True:
-        print("\nfound characterlist.pkl...")
-    
-    else: 
-        characterlist = list()
-        with open ('characterlist.pkl', 'wb') as file:
-            print ("dumping characterlist object to file...")
-            pickle.dump(characterlist, file)
+
 
 checkcharlist()
 opencharlist()

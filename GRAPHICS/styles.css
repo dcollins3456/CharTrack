@@ -122,7 +122,7 @@ body{
     font-family: Comicoro;
     line-height: 18.5px;
     font-size: 16px;
-    color: #cccccc;
+    color: #ff2a7f;
     position: absolute;
     left: 353px;
     top: 103px;
@@ -150,6 +150,11 @@ body{
 
 .tracker.item{
     left: 565px;
+    
+}
+.item{
+    color: #AAAAAA;
+    width: 220px;
 }
 .stress{
     width:120px;
@@ -163,12 +168,17 @@ body{
     border-style: solid;
     border-width: 1px;
     border-color: #eeeeee;
-    width: 141px;
+    width: 140px;
     height: 225px;
     position: absolute;
     left: 24px;
     top: 95px;
     
+}
+.stresscracks{
+    position: absolute;
+    left: -7.5px;
+    top: -8px;
 }
 .playbook{
     width:118px;
