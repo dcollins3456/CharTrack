@@ -232,9 +232,7 @@ def displaystatus(nickname:str):
     imgfile = nextcord.File(imagefile)
     return imgfile
 
-
-
-@client.slash_command(name="new", description="Make a new Player Character, linked to you")
+@client.slash_command(name="new", description="Generate a new Player Character status sheet.")
 async def newchar(interaction: Interaction, name:str, playbook:str):
     name = name.title()
     playbook = playbook.title()
@@ -258,7 +256,30 @@ async def newchar(interaction: Interaction, name:str, playbook:str):
     savecharlist(characterlist)
     await interaction.response.send_message((f"Character Created: **{thischar.charname}** ( '{thischar.safename}' ), the {playbook}"))
 
+@client.slash_command(name="remove", description="Remove a PC status sheet completely. Type \"CONFIRM\" for confirmation.")
+async def removechar(interaction: Interaction, nickname:str, allcaps_confirm:str):
+    characterlist = opencharlist()
+    print(f"\n- - - - - - -\nREMOVE: characterlist before = {characterlist}")
+    filename = nickname+".pkl"
+    print(f"REMOVE: calling to open filename = {filename}")
+    thischar = openchar(filename)
 
+    if allcaps_confirm == "REMOVE":
+        oldname = thischar.charname
+        print(f"REMOVE: deleting file... {filename}")
+        os.remove(datapath+filename)
+        print(f"REMOVE: Character file removed.")
+        print(f"REMOVE: removing {filename} from characterlist")
+        characterlist.remove(filename)
+        savecharlist(characterlist)
+        characterlist = opencharlist()
+        print(f"REMOVE: characterlist updated  = {characterlist}\n- - - - - - -\n")
+        message = (f"{oldname} has been successfully removed.")
+        await interaction.response.send_message(message)
+    else:
+        message = "Removal cancelled. To remove character, please confirm by typing \"CONFIRM\" in confirm field."
+        await interaction.followup.send(message)
+    
 @client.slash_command(name="setnick", description="Allows renaming of a Character's input name")
 async def setnick(interaction: Interaction, nickname:str, newnick:str):
     characterlist = opencharlist()
@@ -291,7 +312,6 @@ async def setnick(interaction: Interaction, nickname:str, newnick:str):
     characterlist = opencharlist()
     print(f"SETNICK: characterlist after  = {characterlist}\n- - - - - - -\n")
     await interaction.response.send_message(f"{thischar.charname} nickname updated to {newnick}")
-
 
 @client.slash_command(name="listall", description="Displays a list of all registered Player Characters and nicknames.")
 async def listall(interaction: Interaction):
