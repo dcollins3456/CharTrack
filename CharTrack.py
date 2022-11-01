@@ -264,8 +264,7 @@ async def removechar(interaction: Interaction, nickname:str, allcaps_confirm:str
     print(f"REMOVE: calling to open filename = {filename}")
     thischar = openchar(filename)
 
-    if allcaps_confirm == "REMOVE":
-        oldname = thischar.charname
+    if allcaps_confirm == "CONFIRM":
         print(f"REMOVE: deleting file... {filename}")
         os.remove(datapath+filename)
         print(f"REMOVE: Character file removed.")
@@ -274,7 +273,7 @@ async def removechar(interaction: Interaction, nickname:str, allcaps_confirm:str
         savecharlist(characterlist)
         characterlist = opencharlist()
         print(f"REMOVE: characterlist updated  = {characterlist}\n- - - - - - -\n")
-        message = (f"{oldname} has been successfully removed.")
+        message = (f"{thischar.charname} has been successfully removed.")
         await interaction.response.send_message(message)
     else:
         message = "Removal cancelled. To remove character, please confirm by typing \"CONFIRM\" in confirm field."
